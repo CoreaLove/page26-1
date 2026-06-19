@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSA 25년 입사자 1주년 기념 모임</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+                   'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    /* ── 헤더 ── */
+    header {
+      background: #1e3a5f;
+      color: #fff;
+      padding: 22px 16px 18px;
+      text-align: center;
+    }
+    header h1 { font-size: 19px; font-weight: 800; margin-bottom: 5px; }
+    header p  { font-size: 12px; opacity: .65; }
+
+    /* ── 레이아웃 ── */
+    .wrap { max-width: 900px; margin: 0 auto; padding: 14px 14px 36px; }
+
+    /* ── 공통 카드 ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* ── 참여자 버튼 ── */
+    .people { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .pbtn {
+      position: relative;
+      padding: 7px 13px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 7px;
+      background: #f9fafb;
+      font-size: 13px; font-weight: 600; color: #374151;
+      cursor: pointer;
+      transition: border-color .12s, background .12s, color .12s;
+    }
+    .pbtn:hover           { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; }
+    .pbtn.on              { background: #1e3a5f; border-color: #1e3a5f; color: #fff; }
+    .pbtn.ov              { background: #fffbeb; border-color: #fbbf24; color: #92400e; }
+    .pbtn.ov.on           { background: #d97706; border-color: #b45309; color: #fff; }
+
+    .pdot {
+      position: absolute; top: 3px; right: 4px;
+      width: 6px; height: 6px;
+      background: #22c55e; border-radius: 50%;
+      border: 1.5px solid #fff;
+    }
+
+    /* ── 상태 바 ── */
+    .statusbar {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: #6b7280;
+    }
+    .statusbar strong { color: #1e3a5f; }
+    .statusbar span:last-child { font-size: 12px; white-space: nowrap; }
+
+    /* ── 달력 ── */
+    .cals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media(max-width:640px) { .cals { grid-template-columns: 1fr; } }
+
+    .cal h2 {
+      text-align: center;
+      font-size: 14px; font-weight: 800; color: #1e3a5f;
+      margin-bottom: 10px;
+    }
+    .cgrid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .dh {
+      text-align: center;
+      font-size: 10px; font-weight: 700; color: #9ca3af;
+      padding-bottom: 4px;
+    }
+    .dh.su { color: #ef4444; }
+    .dh.sa { color: #3b82f6; }
+
+    .dc {
+      aspect-ratio: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border-radius: 6px;
+      font-size: 11.5px; font-weight: 500; color: #374151;
+      border: 1.5px solid transparent;
+      cursor: default;
+      position: relative;
+    }
+    .dc.click { cursor: pointer; }
+    .dc.click:hover { background: #eff6ff; border-color: #bfdbfe; }
+    .dc.su { color: #ef4444; }
+    .dc.sa { color: #3b82f6; }
+    .dc.today::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; background: #f59e0b; border-radius: 50%;
+    }
+
+    /* 개인 선택 */
+    .dc.sel { background: #1e3a5f !important; color: #fff !important; border-color: #1e3a5f !important; }
+
+    /* 총괄 색 단계 */
+    .dc.g1 { background: #dbeafe; border-color: #93c5fd; }
+    .dc.g2 { background: #60a5fa; border-color: #3b82f6; color: #1e3a8a; }
+    .dc.g3 { background: #1d4ed8; border-color: #1e40af; color: #fff; }
+    .dc.gA { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+    .dc.gF { outline: 2.5px solid #2563eb; }
+
+    .badge {
+      font-size: 8px; line-height: 1.5;
+      background: #1d4ed8; color: #fff;
+      border-radius: 3px; padding: 0 3px; margin-top: 1px;
+    }
+    .badge.ab { background: #b45309; }
+
+    /* ── 상세 패널 ── */
+    #detail {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    #detail.show { display: block; }
+    #dDate  { font-size: 14px; font-weight: 700; color: #1d4ed8; margin-bottom: 3px; }
+    #dCount { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+    #dNames { display: flex; flex-wrap: wrap; gap: 5px; }
+    .ntag {
+      background: #dbeafe; color: #1e40af;
+      border-radius: 5px; padding: 3px 9px;
+      font-size: 12px; font-weight: 600;
+    }
+
+    /* ── 컨트롤 ── */
+    .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 8px 16px;
+      border: none; border-radius: 7px;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background .12s;
+    }
+    .btn-save  { background: #1e3a5f; color: #fff; }
+    .btn-save:hover  { background: #2d5080; }
+    .btn-clear { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+    .btn-clear:hover { background: #fee2e2; }
+    .btn-code  { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+    .btn-code:hover  { background: #dcfce7; }
+    .btn-load  { background: #fafafa; color: #374151; border: 1px solid #d1d5db; }
+    .btn-load:hover  { background: #f3f4f6; }
+
+    #savemsg { font-size: 13px; font-weight: 600; color: #16a34a; }
+    #savemsg.err { color: #dc2626; }
+
+    /* ── 코드 취합 패널 ── */
+    #codePanel {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    #codePanel.show { display: block; }
+    #codePanel h3 { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    #codePanel p  { font-size: 11.5px; color: #9ca3af; margin-bottom: 8px; line-height: 1.6; }
+    #codeArea {
+      width: 100%; height: 80px;
+      border: 1px solid #d1d5db; border-radius: 6px;
+      padding: 8px; font-size: 12px; font-family: monospace;
+      resize: vertical; outline: none;
+    }
+    #codeArea:focus { border-color: #93c5fd; }
+    .code-btns { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+    #codeMsg { font-size: 12px; color: #16a34a; font-weight: 600; }
+
+    /* ── 안내 ── */
+    .note {
+      font-size: 11px; color: #9ca3af;
+      text-align: center; line-height: 1.6; padding-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>KSA 25년 입사자 1주년 기념 모임</h1>
+  <p>가능한 날짜를 선택하고 저장해 주세요 &nbsp;·&nbsp; 2026년 6월 · 7월 · 8월</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 참여자 -->
+  <div class="card">
+    <div class="people" id="people"></div>
+  </div>
+
+  <!-- 상태 -->
+  <div class="card statusbar" id="statusbar">
+    <span>인원을 선택하면 달력이 표시됩니다.</span>
+    <span></span>
+  </div>
+
+  <!-- 달력 3개 -->
+  <div class="cals">
+    <div class="card cal"><h2>2026년 6월</h2><div class="cgrid" id="c6"></div></div>
+    <div class="card cal"><h2>2026년 7월</h2><div class="cgrid" id="c7"></div></div>
+    <div class="card cal"><h2>2026년 8월</h2><div class="cgrid" id="c8"></div></div>
+  </div>
+
+  <!-- 총괄 상세 패널 -->
+  <div id="detail">
+    <div id="dDate"></div>
+    <div id="dCount"></div>
+    <div id="dNames"></div>
+  </div>
+
+  <!-- 버튼 -->
+  <div class="card controls">
+    <button class="btn btn-save"  id="svBtn" onclick="save()"      style="display:none">저장</button>
+    <button class="btn btn-clear" id="clBtn" onclick="clearSel()"  style="display:none">선택 초기화</button>
+    <button class="btn btn-code"  id="cpBtn" onclick="copyCode()"  style="display:none">내 코드 복사</button>
+    <button class="btn btn-load"             onclick="togglePanel()">코드 취합</button>
+    <span id="savemsg"></span>
+  </div>
+
+  <!-- 코드 취합 패널 -->
+  <div id="codePanel">
+    <h3>다른 사람의 코드 붙여넣기</h3>
+    <p>
+      각자 날짜를 저장한 뒤 <strong>내 코드 복사</strong> 버튼으로 코드를 공유하고,<br>
+      아래에 여러 사람의 코드를 붙여넣은 후 <strong>불러오기</strong>를 누르면 총괄에 반영됩니다.<br>
+      (예: <code>1:0615,0720 | 2:0701,0815 | 3:0622</code>)
+    </p>
+    <textarea id="codeArea" placeholder="코드를 여기에 붙여넣으세요 (여러 명은 | 로 구분)"></textarea>
+    <div class="code-btns">
+      <button class="btn btn-save" onclick="loadCodes()">불러오기</button>
+      <button class="btn btn-clear" onclick="clearCodes()">전체 초기화</button>
+      <span id="codeMsg"></span>
+    </div>
+  </div>
+
+  <p class="note">
+    날짜 데이터는 이 브라우저에 저장됩니다. 다른 기기와 공유하려면 <strong>내 코드 복사 → 단체 채팅방 공유 → 코드 취합</strong>을 사용하세요.
+  </p>
+
+</div>
+
+<script>
+  var TODAY = '2026-06-19';
+  var M     = [];       // [{ id, name, dates[] }]
+  var who   = null;     // null | 'ov' | id(string)
+  var tmp   = [];       // 편집 중 날짜
+  var focus = null;     // 총괄 포커스 날짜
+
+  /* ── 초기화: XML 읽기 ── */
+  fetch('data.xml')
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(xml) {
+      var doc = new DOMParser().parseFromString(xml, 'application/xml');
+      if (doc.querySelector('parsererror')) throw new Error('XML 파싱 오류');
+
+      var saved = JSON.parse(localStorage.getItem('ksa2026') || '{}');
+      M = Array.from(doc.querySelectorAll('member')).map(function(n) {
+        var id = n.getAttribute('id');
+        return {
+          id:    id,
+          name:  n.getAttribute('name') || ('사람' + id),
+          dates: Array.isArray(saved[id]) ? saved[id] : []
+        };
+      });
+      draw();
+    })
+    .catch(function(e) {
+      document.getElementById('statusbar').innerHTML =
+        '<span style="color:#dc2626">data.xml 로드 실패: ' + e.message
+        + ' — index.html과 data.xml을 같은 폴더에 두고 서버를 통해 열어주세요.</span><span></span>';
+    });
+
+  /* ── 전체 렌더 ── */
+  function draw() {
+    drawPeople();
+    drawCal(6); drawCal(7); drawCal(8);
+    drawStatus();
+  }
+
+  /* ── 참여자 버튼 ── */
+  function drawPeople() {
+    var el = document.getElementById('people');
+    el.innerHTML = '';
+
+    var ob = mkEl('button', 'pbtn ov' + (who === 'ov' ? ' on' : ''));
+    ob.textContent = '총괄';
+    ob.onclick = function() { go('ov'); };
+    el.appendChild(ob);
+
+    M.forEach(function(m) {
+      var b = mkEl('button', 'pbtn' + (who === m.id ? ' on' : ''));
+      b.onclick = (function(id) { return function() { go(id); }; })(m.id);
+      var s = mkEl('span', ''); s.textContent = m.name;
+      b.appendChild(s);
+      if (m.dates.length) { b.appendChild(mkEl('i', 'pdot')); }
+      el.appendChild(b);
+    });
+  }
+
+  /* ── 달력 렌더 ── */
+  function drawCal(mon) {
+    var el = document.getElementById('c' + mon);
+    el.innerHTML = '';
+
+    var DN  = ['일','월','화','수','목','금','토'];
+    var DC  = ['su','','','','','','sa'];
+    DN.forEach(function(n, i) {
+      var h = mkEl('div', 'dh ' + DC[i]);
+      h.textContent = n;
+      el.appendChild(h);
+    });
+
+    var Y  = 2026;
+    var fd = new Date(Y, mon - 1, 1).getDay();
+    var dm = new Date(Y, mon, 0).getDate();
+    var T  = M.length;
+
+    for (var i = 0; i < fd; i++) el.appendChild(mkEl('div', ''));
+
+    for (var d = 1; d <= dm; d++) {
+      var ds  = Y + '-' + p2(mon) + '-' + p2(d);
+      var dow = new Date(Y, mon - 1, d).getDay();
+      var dcls = 'dc ' + (dow === 0 ? 'su' : dow === 6 ? 'sa' : '') + (ds === TODAY ? ' today' : '');
+      var cell = mkEl('div', dcls);
+
+      if (who === 'ov') {
+        var sel = M.filter(function(m) { return m.dates.indexOf(ds) !== -1; });
+        if (sel.length) {
+          var g = sel.length === T ? 'gA'
+                : sel.length >= Math.ceil(T * 0.67) ? 'g3'
+                : sel.length >= Math.ceil(T * 0.34) ? 'g2' : 'g1';
+          cell.className += ' click ' + g + (ds === focus ? ' gF' : '');
+
+          var sn = mkEl('span', ''); sn.textContent = d;
+          cell.appendChild(sn);
+          var bk = mkEl('span', 'badge' + (sel.length === T ? ' ab' : ''));
+          bk.textContent = sel.length + '명';
+          cell.appendChild(bk);
+
+          cell.onclick = (function(capDs, capSel) {
+            return function() { showDetail(capDs, capSel); };
+          })(ds, sel.slice());
+        } else {
+          cell.textContent = d;
+        }
+
+      } else if (who) {
+        cell.className += ' click' + (tmp.indexOf(ds) !== -1 ? ' sel' : '');
+        cell.textContent = d;
+        cell.onclick = (function(capDs) { return function() { tog(capDs); }; })(ds);
+
+      } else {
+        cell.textContent = d;
+      }
+
+      el.appendChild(cell);
+    }
+  }
+
+  /* ── 상태 표시 ── */
+  function drawStatus() {
+    var el = document.getElementById('statusbar');
+    if (!who) {
+      el.innerHTML = '<span>인원을 선택하면 달력이 표시됩니다.</span><span></span>';
+    } else if (who === 'ov') {
+      var cnt = new Set(M.reduce(function(a, m) { return a.concat(m.dates); }, [])).size;
+      el.innerHTML = '<span><strong>총괄</strong> — 날짜를 클릭하면 참여자를 확인합니다.</span><span>' + cnt + '일 마킹됨</span>';
+    } else {
+      var m = M.find(function(x) { return x.id === who; });
+      el.innerHTML = '<span><strong>' + m.name + '</strong> — 날짜를 클릭해 선택·취소 후 저장하세요.</span>'
+                   + '<span>' + tmp.length + '일 선택 (저장 ' + m.dates.length + '일)</span>';
+    }
+  }
+
+  /* ── 인원 전환 ── */
+  function go(id) {
+    if (who && who !== 'ov') {
+      var m = M.find(function(x) { return x.id === who; });
+      if (m.dates.slice().sort().join() !== tmp.slice().sort().join()) {
+        if (!confirm(m.name + '의 변경사항이 저장되지 않았습니다. 이동하시겠습니까?')) return;
+      }
+    }
+    who   = id;
+    focus = null;
+    document.getElementById('detail').classList.remove('show');
+    document.getElementById('savemsg').textContent = '';
+
+    var isOv = (id === 'ov');
+    tmp = isOv ? [] : M.find(function(x) { return x.id === id; }).dates.slice();
+
+    document.getElementById('svBtn').style.display = isOv ? 'none' : 'inline-block';
+    document.getElementById('clBtn').style.display = isOv ? 'none' : 'inline-block';
+    document.getElementById('cpBtn').style.display = isOv ? 'none' : 'inline-block';
+    draw();
+  }
+
+  /* ── 날짜 토글 ── */
+  function tog(ds) {
+    var i = tmp.indexOf(ds);
+    if (i === -1) tmp.push(ds); else tmp.splice(i, 1);
+    drawCal(+(ds.slice(5, 7)));
+    drawStatus();
+  }
+
+  /* ── 저장 (localStorage) ── */
+  function save() {
+    var m = M.find(function(x) { return x.id === who; });
+    m.dates = tmp.slice();
+    persist();
+    draw();
+    var msg = document.getElementById('savemsg');
+    msg.className = '';
+    msg.textContent = '✓ ' + m.name + ' 저장됨';
+    setTimeout(function() { msg.textContent = ''; }, 2500);
+  }
+
+  function persist() {
+    var obj = {};
+    M.forEach(function(m) { obj[m.id] = m.dates; });
+    localStorage.setItem('ksa2026', JSON.stringify(obj));
+  }
+
+  /* ── 선택 초기화 ── */
+  function clearSel() {
+    if (confirm('선택된 날짜를 모두 지우시겠습니까?')) {
+      tmp = [];
+      draw();
+    }
+  }
+
+  /* ── 총괄 상세 ── */
+  function showDetail(ds, sel) {
+    focus = ds;
+    var dt  = new Date(ds + 'T00:00:00');
+    var KRD = ['일','월','화','수','목','금','토'];
+    document.getElementById('dDate').textContent =
+      dt.getFullYear() + '년 ' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 (' + KRD[dt.getDay()] + ')';
+    document.getElementById('dCount').textContent = '총 ' + sel.length + '명 선택';
+    var dn = document.getElementById('dNames');
+    dn.innerHTML = '';
+    sel.forEach(function(m) {
+      var t = mkEl('span', 'ntag');
+      t.textContent = m.name;
+      dn.appendChild(t);
+    });
+    document.getElementById('detail').classList.add('show');
+    draw();
+    document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* ── 내 코드 복사 ── */
+  // 형식: "id:MMDD,MMDD,..."  예) "3:0615,0720,0808"
+  function copyCode() {
+    var m = M.find(function(x) { return x.id === who; });
+    if (!m) return;
+    var code = encodeM(m);
+    navigator.clipboard.writeText(code).then(function() {
+      var msg = document.getElementById('savemsg');
+      msg.className = '';
+      msg.textContent = '✓ 코드 복사됨: ' + code;
+      setTimeout(function() { msg.textContent = ''; }, 3000);
+    }).catch(function() {
+      prompt('아래 코드를 복사하세요:', code);
+    });
+  }
+
+  function encodeM(m) {
+    if (!m.dates.length) return m.id + ':';
+    return m.id + ':' + m.dates.map(function(d) {
+      return d.slice(5).replace('-', '');   // "2026-06-15" → "0615"
+    }).join(',');
+  }
+
+  /* ── 코드 취합 패널 ── */
+  function togglePanel() {
+    var p = document.getElementById('codePanel');
+    p.classList.toggle('show');
+  }
+
+  function loadCodes() {
+    var raw = document.getElementById('codeArea').value.trim();
+    if (!raw) return;
+
+    var parts = raw.split(/[|\n]+/);
+    var count = 0;
+    var errs  = [];
+
+    parts.forEach(function(part) {
+      part = part.trim();
+      if (!part) return;
+      var idx = part.indexOf(':');
+      if (idx === -1) { errs.push(part); return; }
+
+      var id    = part.slice(0, idx).trim();
+      var dates = part.slice(idx + 1).trim();
+      var m = M.find(function(x) { return x.id === id; });
+      if (!m) { errs.push('알 수 없는 ID: ' + id); return; }
+
+      m.dates = dates ? dates.split(',').map(function(dd) {
+        dd = dd.trim();
+        if (dd.length !== 4) return null;
+        return '2026-' + dd.slice(0, 2) + '-' + dd.slice(2);
+      }).filter(function(d) { return d && /^\d{4}-\d{2}-\d{2}$/.test(d); }) : [];
+
+      count++;
+    });
+
+    persist();
+    draw();
+
+    var msg = document.getElementById('codeMsg');
+    if (errs.length) {
+      msg.style.color = '#dc2626';
+      msg.textContent = count + '명 반영 / 오류: ' + errs.join(', ');
+    } else {
+      msg.style.color = '#16a34a';
+      msg.textContent = '✓ ' + count + '명의 데이터를 불러왔습니다.';
+    }
+    setTimeout(function() { msg.textContent = ''; }, 3000);
+  }
+
+  function clearCodes() {
+    if (!confirm('모든 날짜 데이터를 초기화하시겠습니까?')) return;
+    M.forEach(function(m) { m.dates = []; });
+    tmp = [];
+    persist();
+    document.getElementById('codeArea').value = '';
+    draw();
+  }
+
+  /* ── 유틸 ── */
+  function mkEl(tag, cls) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls.trim();
+    return el;
+  }
+  function p2(n) { return String(n).padStart(2, '0'); }
+</script>
+</body>
+</html>
